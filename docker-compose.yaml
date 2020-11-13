@@ -1,0 +1,36 @@
+version: '2.0'
+services:
+  localdev_synapse:
+    container_name: "localdev_synapse"
+    image: "matrixdotorg/synapse:latest"
+    restart: unless-stopped
+    volumes:
+      - ./synapse:/conf
+      - ./synapse/data:/data
+    environment:
+      SYNAPSE_CONFIG_DIR: "/conf"
+      SYNAPSE_DATA_DIR: "/data"
+    ports:
+      - "8118:8008"
+    networks:
+      - localdev_proxy
+  localdev_nginx:
+    container_name: "localdev_nginx"
+    image: "nginx:latest"
+    restart: unless-stopped
+    volumes:
+      - ./nginx-site.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - "8083:80"
+    networks:
+      - localdev_proxy
+  localdev_element:
+    container_name: "localdev_element"
+    image: "vectorim/riot-web:latest"
+    restart: unless-stopped
+    volumes:
+      - ./element-config.json:/app/config.json
+    networks:
+      - localdev_proxy
+networks:
+  localdev_proxy:
